@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+  jenkins:
+    build:
+      context: .
+    container_name: jenkins-iac
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    networks:
+      - jenkins_net
+    environment:
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/jenkins.yml
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ./jenkins.yml:/var/jenkins_home/jenkins.yml 
+
+  docker-agent:
+    image: docker:24.0.7-dind 
+    container_name: docker-agent-service
+    privileged: true        
+    environment:
+      - DOCKER_TLS_CERTDIR="" 
+    command: 
+      - dockerd
+      - -H 
+      - tcp://0.0.0.0:2375
+      - -H 
+      - unix:///var/run/docker.sock
+    networks:
+      - jenkins_net         
+    ports:
+      - 2375
+
+volumes:
+  jenkins_home:
+
+networks:
+  jenkins_net:
+    driver: bridge

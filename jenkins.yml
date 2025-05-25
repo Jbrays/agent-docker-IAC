@@ -1,0 +1,25 @@
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          name: "lab09"
+          password: "admin123"
+
+  clouds:
+    - docker:
+        name: "Docker-Cloud"
+        dockerApi:
+          dockerHost:
+            uri: "tcp://docker-agent:2375"
+        templates:
+          - name: "docker-agent"
+            labelString: "docker-agent" 
+            remoteFs: "/home/jenkins/agent"
+            connector:
+              attach:
+                user: root
+            dockerTemplateBase: 
+              image: "jenkins/inbound-agent:jdk21"
+              
